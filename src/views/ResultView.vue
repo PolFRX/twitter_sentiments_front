@@ -24,7 +24,7 @@ export default{
 </script>
 
 <template>
-<div ref="result">
+<div ref="result" id="result">
   <button class="result" @click="count++">You clicked me {{ count }} times.</button>
 </div>
 </template>
@@ -33,5 +33,10 @@ export default{
 button
 {
     text-align: center;
+}
+#result
+{
+    height: 100vh;
+    background-color: blue;
 }
 </style>
