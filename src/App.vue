@@ -4,34 +4,67 @@ import FooterView from './views/FooterView.vue'
 </script>
 
 <script>
-import { MDBInput, MDBBtn, MDBSpinner } from 'mdb-vue-ui-kit';
+import { MDBInput, MDBBtn, MDBSpinner, MDBModal, MDBModalBody, MDBModalFooter } from 'mdb-vue-ui-kit';
 
 export default {
   components: {
       MDBBtn,
       MDBInput,
-      MDBSpinner
+      MDBSpinner,
+      MDBModal,
+      MDBModalBody,
+      MDBModalFooter
     },
   data() {
     return {
       twitter_subject: "",
-      show_spinner: false
+      show_spinner: false,
+      result: "",
+      show_error_modal: false
     }
   },
   methods: {
       async get_result() {
           this.show_spinner = true
           console.log(this.twitter_subject)
+          
           const payload = {
-              twitter_subject: this.twitter_subject
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ twitter_subject: this.twitter_subject })
+          };
+          // try {
+          //   let response = await fetch("https://api.chucknorris.io/jokes/random", payload);
+          //   console.log("getting response json")
+          //   response = await response.json();
+          //   this.result = response.value;
+
+          //   console.log(this.result)
+          //   this.show_spinner = false
+          //   this.clearForm();
+          //   this.$router.push({ path: '/result' , hash: '#result'})
+          // } catch (error) {
+            // console.log(error);
+            // this.show_spinner = false
+          //   this.show_error_modal = true;
+          // }
+
+          await this.sleep(1000)
+          try {
+            throw "erreur";
+            let response = await fetch("https://api.chucknorris.io/jokes/random");
+            response = await response.json();
+            this.result = response.value;
+
+            console.log(this.result)
+            this.show_spinner = false
+            this.clearForm();
+            this.$router.push({ path: '/result' , hash: '#result'})
+          } catch (error) {
+            console.log(error);
+            this.show_spinner = false
+            this.show_error_modal = true;
           }
-        //   fetch("https://api.npms.io/v2/search?q=vue")
-        //     .then(response => response.json())
-        //     .then(data => (this.totalVuePackages = data.total));
-          await this.sleep(2000)
-          this.show_spinner = false
-          this.clearForm();
-          this.$router.push({ path: '/result' , hash: '#result'})
       },
       clearForm() {
           this.twitter_subject = "";
@@ -70,9 +103,22 @@ export default {
   </div>
 </div>
 
-<RouterView />
+<RouterView :result="result" />
 
 <FooterView></FooterView>
+
+<MDBModal
+    id="error-modal"
+    tabindex="-1"
+    labelledby="errorModal"
+    v-model="show_error_modal"
+    size="sm"
+  >
+    <MDBModalBody>Oups, there was an error... Try later</MDBModalBody>
+    <MDBModalFooter>
+      <MDBBtn color="danger" @click="show_error_modal = false">Close</MDBBtn>
+    </MDBModalFooter>
+  </MDBModal>
 
 </template>
 
@@ -93,6 +139,10 @@ export default {
 }
 .full-height {
   height: 100vh;
+}
+.modal-content
+{
+  border: 1.3px solid #f93154 !important;
 }
 
 </style>
